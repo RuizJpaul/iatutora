@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify
 import os
-import google.generativeai as genai
+from google import genai
 from src.utils.mongo import mongo_db
 from dotenv import load_dotenv
 from src.utils.extract import read_pdf
 from datetime import datetime
 
 load_dotenv()
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 bp = Blueprint("ia", __name__, url_prefix="/api/ia")
 PDF_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "uploads", "clase01.pdf")
@@ -36,8 +36,10 @@ Instrucciones:
 - Solo genera el primer bloque y la primera pregunta.
 """
 
-    model = genai.GenerativeModel("gemini-2.0-flash-exp")
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash-exp",
+        contents=prompt
+    )
 
     # Guardar historial en MongoDB
     mongo_db.historial.insert_one({
@@ -106,8 +108,10 @@ Instrucciones:
 6. No repitas contenido ya explicado ni avances a temas futuros antes de que la duda esté resuelta.
 """
 
-    model = genai.GenerativeModel("gemini-2.0-flash-exp")
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash-exp",
+        contents=prompt
+    )
 
     # Guardar interacción en MongoDB
     mongo_db.historial.insert_one({
