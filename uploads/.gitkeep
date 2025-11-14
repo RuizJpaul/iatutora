@@ -1,0 +1,2 @@
+# Este archivo mantiene la carpeta uploads/ en Git
+# Los PDFs reales están en .gitignore pero esta carpeta debe existir
